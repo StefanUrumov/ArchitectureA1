@@ -53,7 +53,7 @@ public class WriteToFileFilter extends SingleOutputFilterFramework
 
 		System.out.print( "\n" + this.getName() + "::Sink Reading ");
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("OutputA.dat"));
+			BufferedWriter out = new BufferedWriter(new FileWriter("OutputB.dat"));
 			out.write("Time:\t\t\t\t\t\t    Temperature(C):     Altitude(m):        Pressure(psi):");
 			out.newLine();
 			out.write("---------------------------------------------------------"
