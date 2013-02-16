@@ -1,4 +1,4 @@
-package gizmoe.architecture.system2;
+package gizmo.architecture.system3;
 /******************************************************************************************************************
 * File:WriteToFileFilter.java
 * Course: 17655
@@ -22,13 +22,15 @@ package gizmoe.architecture.system2;
 * 	Upsham K Dawra
 *
 ******************************************************************************************************************/
+
+
 import java.util.*;						// This class is used to interpret time words
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;		// This class is used to format and write time in a string format.
 
-public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
+public class WriteWildPressureAttitudeToFileFilter extends SingleOutputFilterFramework
 {
 	public void run()
     {
@@ -45,15 +47,15 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 
 		long measurement;				// This is the word used to store all measurements - conversions are illustrated.
 		int id;							// This is the measurement id
-		String pressureFrameBuffer = "", attitudeFrameBuffer = "";
+		String pressureFrameBuffer = "";
 		/*************************************************************
 		*	First we announce to the world that we are alive...
 		**************************************************************/
 
-		System.out.print( "\n" + this.getName() + "::WriteWildValuesToFileFilter Reading ");
+		System.out.print( "\n" + this.getName() + "::WriteWildPressureAttitudeToFileFilter Reading ");
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter("WildPointsB.dat"));
-			out.write("Time:\t\t\t\t\t\t    Pressure(psi):    Attitude(degrees):");
+			out.write("Time:\t\t\t\t\tPressure(psi):    Attitude(degrees):");
 			out.newLine();
 			out.write("---------------------------------------------------------"
 					+"----------------------------------------------------------");
@@ -72,21 +74,21 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 						TimeStamp.setTimeInMillis(measurement);
 						out.write(TimeStampFormat.format(TimeStamp.getTime())+"\t\t");
 					} // if
-					else if(id == PRESSURE){
+					else if(id == PRESSURE+10){
 						if(Double.longBitsToDouble(measurement) > 0){
 							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
-							out.write(pressureFrameBuffer);
+							out.write(pressureFrameBuffer+"\t\t\t");
 						}else{
 							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
-							out.write(pressureFrameBuffer);
+							out.write(pressureFrameBuffer+"\t\t\t");
 						}
-					}else if(id == ATTITUDE){
+					}else if(id == ATTITUDE+10){
 						if(Double.longBitsToDouble(measurement) > 0){
-							attitudeFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
-							out.write(attitudeFrameBuffer);
+							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
+							out.write(pressureFrameBuffer+"\t\t\t\n");
 						}else{
-							attitudeFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
-							out.write(attitudeFrameBuffer);
+							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
+							out.write(pressureFrameBuffer+"\t\t\t\n");
 						}
 					}
 
@@ -95,7 +97,7 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 				{
 					ClosePorts();
 					out.close();
-					System.out.print( "\n" + this.getName() + "::WildValueWriter Exiting; bytes read: " + bytesread );
+					System.out.print( "\n" + this.getName() + "::WriteWildPressureAttitudeToFileFilter Exiting; bytes read: " + bytesread );
 					break;
 
 				} // catch

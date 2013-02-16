@@ -1,4 +1,4 @@
-package gizmoe.architecture.system2;
+package gizmo.architecture.system3;
 /******************************************************************************************************************
 * File:WriteToFileFilter.java
 * Course: 17655
@@ -45,15 +45,15 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 
 		long measurement;				// This is the word used to store all measurements - conversions are illustrated.
 		int id;							// This is the measurement id
-		String pressureFrameBuffer = "", attitudeFrameBuffer = "";
+		String pressureFrameBuffer = "";
 		/*************************************************************
 		*	First we announce to the world that we are alive...
 		**************************************************************/
 
-		System.out.print( "\n" + this.getName() + "::WriteWildValuesToFileFilter Reading ");
+		System.out.print( "\n" + this.getName() + "::WildValueWriter Reading ");
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("WildPointsB.dat"));
-			out.write("Time:\t\t\t\t\t\t    Pressure(psi):    Attitude(degrees):");
+			BufferedWriter out = new BufferedWriter(new FileWriter("WildPointsA.dat"));
+			out.write("Time:\t\t\t\t\t\t    Pressure(psi):");
 			out.newLine();
 			out.write("---------------------------------------------------------"
 					+"----------------------------------------------------------");
@@ -79,14 +79,6 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 						}else{
 							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
 							out.write(pressureFrameBuffer);
-						}
-					}else if(id == ATTITUDE){
-						if(Double.longBitsToDouble(measurement) > 0){
-							attitudeFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
-							out.write(attitudeFrameBuffer);
-						}else{
-							attitudeFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
-							out.write(attitudeFrameBuffer);
 						}
 					}
 

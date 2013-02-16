@@ -1,4 +1,4 @@
-package gizmoe.architecture.system2;
+package gizmo.architecture.system3;
 /******************************************************************************************************************
 * File:WildValueExtrapolationFilter.java
 * Course: 17655
@@ -28,8 +28,8 @@ import java.util.ArrayDeque;
 
 public class WildValueExtrapolationFilter extends MultiOutputFilterFramework
 {
-	private final int WildLowBound = 45;
-	private final int WildHighBound = 90;
+	private final int WildLowBound = 50;
+	private final int WildHighBound = 80;
 	private ArrayDeque<Bundle> buffer = new ArrayDeque<Bundle>();
 	private final int frameSize = 4;
 	public void run()

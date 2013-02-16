@@ -1,4 +1,4 @@
-package gizmoe.architecture.system2;
+package gizmo.architecture.system3;
 /******************************************************************************************************************
 * File:WriteToFileFilter.java
 * Course: 17655
@@ -28,7 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;		// This class is used to format and write time in a string format.
 
-public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
+public class WriteToFileFilter extends SingleOutputFilterFramework
 {
 	public void run()
     {
@@ -45,15 +45,16 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 
 		long measurement;				// This is the word used to store all measurements - conversions are illustrated.
 		int id;							// This is the measurement id
-		String pressureFrameBuffer = "", attitudeFrameBuffer = "";
+		String altitudeFrameBuffer = "";
+		String pressureFrameBuffer = "";
 		/*************************************************************
 		*	First we announce to the world that we are alive...
 		**************************************************************/
 
-		System.out.print( "\n" + this.getName() + "::WriteWildValuesToFileFilter Reading ");
+		System.out.print( "\n" + this.getName() + "::WriteToFileFilter Reading ");
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("WildPointsB.dat"));
-			out.write("Time:\t\t\t\t\t\t    Pressure(psi):    Attitude(degrees):");
+			BufferedWriter out = new BufferedWriter(new FileWriter("Output.dat"));
+			out.write("Time:\t\t\t\t\t\t    Temperature(C):     Altitude(m):        Pressure(psi)        Altitude(degrees)::");
 			out.newLine();
 			out.write("---------------------------------------------------------"
 					+"----------------------------------------------------------");
@@ -72,22 +73,26 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 						TimeStamp.setTimeInMillis(measurement);
 						out.write(TimeStampFormat.format(TimeStamp.getTime())+"\t\t");
 					} // if
+					else if(id == ALTITUDE){
+						
+						altitudeFrameBuffer = String.format("%11s", String.format("%5.5f",Double.longBitsToDouble(measurement))).replace(' ', '0');
+					}
+					else if(id == TEMPERATURE){
+						out.write(String.format("%9s", String.format("%.5f",Double.longBitsToDouble(measurement)))+"\t\t\t");
+						out.write(altitudeFrameBuffer+"\t\t\t");
+						out.write(pressureFrameBuffer+"\t\t\t");
+					}
 					else if(id == PRESSURE){
-						if(Double.longBitsToDouble(measurement) > 0){
-							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
-							out.write(pressureFrameBuffer);
-						}else{
-							pressureFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
-							out.write(pressureFrameBuffer);
-						}
-					}else if(id == ATTITUDE){
-						if(Double.longBitsToDouble(measurement) > 0){
-							attitudeFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
-							out.write(attitudeFrameBuffer);
-						}else{
-							attitudeFrameBuffer = String.format("%10s", String.format("%4.5f",Double.longBitsToDouble(measurement))).replace('.',':');
-							out.write(attitudeFrameBuffer);
-						}
+						pressureFrameBuffer = String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
+					}
+					else if(id == PRESSURE+CORRECTION_OFFSET){
+						pressureFrameBuffer = String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':')+"*";
+					}
+					else if(id == ATTITUDE){
+						out.write(String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':'));
+					}
+					else if(id == ATTITUDE+CORRECTION_OFFSET){
+						out.write(String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':')+"*");
 					}
 
 				} // try
@@ -95,7 +100,7 @@ public class WriteWildValuesToFileFilter extends SingleOutputFilterFramework
 				{
 					ClosePorts();
 					out.close();
-					System.out.print( "\n" + this.getName() + "::WildValueWriter Exiting; bytes read: " + bytesread );
+					System.out.print( "\n" + this.getName() + "::WriteToFileFilter Exiting; bytes read: " + bytesread );
 					break;
 
 				} // catch
