@@ -30,9 +30,9 @@ public class Plumber
 
 		SourceFilter Filter1 = new SourceFilter();
 		PruneDataFilter Filter2 = new PruneDataFilter();
-		ConvertTemperatureFilter Filter3 = new ConvertTemperatureFilter();
-		ConvertAltitudeFilter Filter4 = new ConvertAltitudeFilter();
-		WriteToFileFilter Filter5 = new WriteToFileFilter();
+		TempConvFilter Filter3 = new TempConvFilter();
+		AltConvFilter Filter4 = new AltConvFilter();
+		WriteTempAltFilter Filter5 = new WriteTempAltFilter();
 		/****************************************************************************
 		* Here we connect the filters starting with the sink filter (Filter 1) which
 		* we connect to Filter2 the middle filter. Then we connect Filter2 to the

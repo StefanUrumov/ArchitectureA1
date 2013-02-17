@@ -4,6 +4,7 @@
 * Project: Assignment 1
 * Versions:
 *	1.0 15 February 2013 - Initial code (ukd).
+*	1.1 16 Febrauary 2013 - Took out MultiOutput Class Dependency (ss)
 *
 * Description:
 *
@@ -69,44 +70,7 @@ public class Connector extends Thread
 		} // catch
 
 	} // Connect
-	void Connect (MultiOutputFilterFramework Filter){
-		try
-		{
-			// Connect this filter's input to the upstream pipe's output stream
-				InputReadPort.connect( Filter.OutputWritePort );
-				InputFilter = Filter;
-
-		} // try
-
-		catch( Exception Error )
-		{
-			System.out.println( "\n" + this.getName() + " FilterFramework error connecting::"+ Error );
-
-		} // catch
-	}
-	void Connect (MultiOutputFilterFramework Filter, int port){
-		try
-		{
-			// Connect this filter's input to the upstream pipe's output stream
-			switch(port){
-			case 1:
-				InputReadPort.connect( Filter.OutputWritePort );
-				InputFilter = Filter;
-				break;
-			case 2:
-				InputReadPort.connect( Filter.OutputWritePort2 );
-				InputFilter = Filter;
-				break;
-			}
-
-		} // try
-
-		catch( Exception Error )
-		{
-			System.out.println( "\n" + this.getName() + " FilterFramework error connecting::"+ Error );
-
-		} // catch
-	}
+	
 	/******************************************************************************
 	 * All read methods here, since we never "merge" and support only one input port
 	 ******************************************************************************/
