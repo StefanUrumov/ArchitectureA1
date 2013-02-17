@@ -157,6 +157,12 @@ public class WildValueExtrapolationFilter extends MultiOutputFilterFramework
 						}
 					}
 				}
+				while(!buffer.isEmpty()){
+					Bundle pack = buffer.remove();
+					writeInt(pack.id, 1);
+					writeDouble(pack.measurement, 1);
+					byteswritten+=12;
+				}
 				ClosePorts();
 				System.out.println( "\n" + this.getName() + "::WildValueExtrapolationFilter Exiting; bytes read: " + bytesread + " bytes written to port 1: " + byteswritten + " bytes written to port 2: " + byteswrittentoport2);
 				break;

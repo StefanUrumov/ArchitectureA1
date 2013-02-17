@@ -42,7 +42,7 @@ public class WriteToFileFilter extends SingleOutputFilterFramework
 		SimpleDateFormat TimeStampFormat = new SimpleDateFormat("yyyy MM dd::hh:mm:ss:SSS");
 
 		int bytesread = 0;				// This is the number of bytes read from the stream
-
+		int byteswritten = 0;
 		long measurement;				// This is the word used to store all measurements - conversions are illustrated.
 		int id;							// This is the measurement id
 		String altitudeFrameBuffer = "";
@@ -66,33 +66,46 @@ public class WriteToFileFilter extends SingleOutputFilterFramework
 
 					measurement = ReadMeasurementFromFilterInputPort();
 					bytesread+=12;
-
+					if(id == VELOCITY){
+						byteswritten+=12;
+					}
 					if ( id == TIME )
 					{
 						out.newLine();
 						TimeStamp.setTimeInMillis(measurement);
 						out.write(TimeStampFormat.format(TimeStamp.getTime())+"\t\t");
+						byteswritten+=12;
+						
 					} // if
 					else if(id == ALTITUDE){
 						
 						altitudeFrameBuffer = String.format("%11s", String.format("%5.5f",Double.longBitsToDouble(measurement))).replace(' ', '0');
+						out.write(altitudeFrameBuffer+"\t\t\t");
+						byteswritten+=12;
 					}
 					else if(id == TEMPERATURE){
 						out.write(String.format("%9s", String.format("%.5f",Double.longBitsToDouble(measurement)))+"\t\t\t");
-						out.write(altitudeFrameBuffer+"\t\t\t");
-						out.write(pressureFrameBuffer+"\t\t\t");
+						//out.write(altitudeFrameBuffer+"\t\t\t");
+						//out.write(pressureFrameBuffer+"\t\t\t");
+						byteswritten+=12;
 					}
 					else if(id == PRESSURE){
 						pressureFrameBuffer = String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':');
+						out.write(pressureFrameBuffer+"\t\t\t");
+						byteswritten+=12;
 					}
 					else if(id == PRESSURE+CORRECTION_OFFSET){
 						pressureFrameBuffer = String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':')+"*";
+						out.write(pressureFrameBuffer+"\t\t\t");
+						byteswritten+=12;
 					}
 					else if(id == ATTITUDE){
 						out.write(String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':'));
+						byteswritten+=12;
 					}
 					else if(id == ATTITUDE+CORRECTION_OFFSET){
 						out.write(String.format("%8s", String.format("%2.5f",Double.longBitsToDouble(measurement))).replace(' ', '0').replace('.',':')+"*");
+						byteswritten+=12;
 					}
 
 				} // try
@@ -100,7 +113,7 @@ public class WriteToFileFilter extends SingleOutputFilterFramework
 				{
 					ClosePorts();
 					out.close();
-					System.out.print( "\n" + this.getName() + "::WriteToFileFilter Exiting; bytes read: " + bytesread );
+					System.out.print( "\n" + this.getName() + "::WriteToFileFilter Exiting; bytes read: " + bytesread +" bytes written: "+byteswritten);
 					break;
 
 				} // catch

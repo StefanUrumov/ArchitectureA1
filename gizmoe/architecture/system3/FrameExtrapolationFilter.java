@@ -45,32 +45,32 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 		writeLong(pack.time, 1);
 		bytesWritten+=12;
 
-		if (pack.velocity != -1) {
+		if (pack.velocity != Double.MAX_VALUE) {
 			writeInt(VELOCITY, 1);
 			writeDouble(pack.velocity, 1);
 			bytesWritten+=12;
 		}
 
-		if (pack.altitude != -1) {
+		if (pack.altitude != Double.MAX_VALUE) {
 			writeInt(ALTITUDE, 1);
 			writeDouble(pack.altitude, 1);
 			bytesWritten+=12;
 		}
 
-		if (pack.pressure != -1) {
+		if (pack.pressure != Double.MAX_VALUE) {
 			writeInt(PRESSURE, 1);
 			writeDouble(pack.pressure, 1);
 
 			bytesWritten+=12;
 		}
 
-		if (pack.temperature != -1) {
+		if (pack.temperature != Double.MAX_VALUE) {
 			writeInt(TEMPERATURE, 1);
 			writeDouble(pack.temperature, 1);
 			bytesWritten+=12;
 		}
 
-		if (pack.attitude != -1) {
+		if (pack.attitude != Double.MAX_VALUE) {
 			writeInt(ATTITUDE, 1);
 			writeDouble(pack.attitude, 1);
 			bytesWritten+=12;
@@ -90,29 +90,29 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 		}
 
 
-			if (lastValidPressure != Double.MAX_VALUE && latestValidPressure != Double.MAX_VALUE) {
-				avgPresssure = (latestValidPressure + lastValidPressure)/2;
-			} else if (lastValidPressure != Double.MAX_VALUE) {
-				avgPresssure = lastValidPressure;
-			} else  if (latestValidPressure != Double.MAX_VALUE) {
-				avgPresssure = latestValidPressure;
-			}
+		if (lastValidPressure != Double.MAX_VALUE && latestValidPressure != Double.MAX_VALUE) {
+			avgPresssure = (latestValidPressure + lastValidPressure)/2;
+		} else if (lastValidPressure != Double.MAX_VALUE) {
+			avgPresssure = lastValidPressure;
+		} else  if (latestValidPressure != Double.MAX_VALUE) {
+			avgPresssure = latestValidPressure;
+		}
 
-			if (avgPresssure > PressureLimit) {
-				avgPresssure = (lastValidPressure < latestValidPressure) ? lastValidPressure : latestValidPressure;
-			}
+		if (avgPresssure > PressureLimit) {
+			avgPresssure = (lastValidPressure < latestValidPressure) ? lastValidPressure : latestValidPressure;
+		}
 			
-			if (lastValidAttitude != Double.MAX_VALUE && latestValidAttitude != Double.MAX_VALUE) {
-				avgAttitude = (latestValidAttitude + lastValidAttitude)/2;
-			} else if (lastValidAttitude != Double.MAX_VALUE) {
-				avgAttitude = lastValidAttitude;
-			} else if (latestValidAttitude != Double.MAX_VALUE) {
-				avgAttitude = latestValidAttitude;
-			}
+		if (lastValidAttitude != Double.MAX_VALUE && latestValidAttitude != Double.MAX_VALUE) {
+			avgAttitude = (latestValidAttitude + lastValidAttitude)/2;
+		} else if (lastValidAttitude != Double.MAX_VALUE) {
+			avgAttitude = lastValidAttitude;
+		} else if (latestValidAttitude != Double.MAX_VALUE) {
+			avgAttitude = latestValidAttitude;
+		}
 
-			if (avgAttitude > AttitudeLimit) {
-				avgAttitude = (lastValidAttitude < latestValidAttitude) ? lastValidAttitude : latestValidAttitude;
-			}
+		if (avgAttitude > AttitudeLimit) {
+			avgAttitude = (lastValidAttitude < latestValidAttitude) ? lastValidAttitude : latestValidAttitude;
+		}
 			
 
 		while(!buffer.isEmpty()) {
@@ -121,23 +121,29 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 			writeLong(pack.time, 1);
 			bytesWritten+=12;
 
-			if (pack.velocity != -1) {
+			if (pack.velocity != Double.MAX_VALUE) {
 				writeInt(VELOCITY, 1);
 				writeDouble(pack.velocity, 1);
 				bytesWritten+=12;
 			}
 
-			if (pack.altitude != -1) {
+			if (pack.altitude != Double.MAX_VALUE) {
 				writeInt(ALTITUDE, 1);
 				writeDouble(pack.altitude, 1);
 				bytesWritten+=12;
 			}
 
-			if (pack.pressure != -1) {
-				writeInt(PRESSURE + CORRECTION_OFFSET, 1);
+			if (pack.pressure != Double.MAX_VALUE) {
 				if (pack.needToExtrapolate()) {
+					writeInt(PRESSURE + CORRECTION_OFFSET, 1);
 					System.out.println("\n EXTRAPOLATED: Pressure " + pack.pressure +" To "+ avgPresssure);
 					writeDouble(avgPresssure, 1);
+				} else {
+					if (pack.dirtyPressure) {
+						writeInt(PRESSURE + CORRECTION_OFFSET, 1);
+					} else {
+						writeInt(PRESSURE, 1);
+					}
 				}
 
 				bytesWritten+=12;
@@ -149,17 +155,19 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 				writeDouble(pack.pressure, 2);
 			}
 
-			if (pack.temperature != -1) {
+			if (pack.temperature != Double.MAX_VALUE) {
 				writeInt(TEMPERATURE, 1);
 				writeDouble(pack.temperature, 1);
 				bytesWritten+=12;
 			}
 
-			if (pack.attitude != -1) {
-				writeInt(ATTITUDE + CORRECTION_OFFSET, 1);
+			if (pack.attitude != Double.MAX_VALUE) {
 				if (pack.needToExtrapolate()) {
+					writeInt(ATTITUDE + CORRECTION_OFFSET, 1);
 					System.out.println("\n EXTRAPOLATED: Altitude " + pack.attitude +" To "+ avgAttitude + "\n");
 					writeDouble(avgAttitude, 1);
+				} else {
+					writeInt(ATTITUDE, 1);
 				}
 
 				bytesWritten+=12;
@@ -252,8 +260,8 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 				break;
 				case 1: currentFrame.velocity = measurement;break;
 				case 2:	currentFrame.altitude = measurement;break;
-				case 3: 
-				case 13:currentFrame.pressure = measurement;break;
+				case 3: currentFrame.pressure = measurement;break;
+				case 13:currentFrame.pressure = measurement; currentFrame.dirtyPressure = true; break;
 				case 4:	currentFrame.temperature = measurement;break;
 				case 5: currentFrame.attitude = measurement;break;
 				} // switch
@@ -264,7 +272,7 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 			if (currentFrame.isValid()) {
 				if (currentFrame.needToExtrapolate()) {
 					// Last frame is invalid
-					buffer.add(currentFrame);
+					buffer.add(currentFrame.clone());
 					needToExtrapolate = true;
 					byteswritten += writeToPort(latestValidPressure, latestValidAttitude, lastValidPressure, lastValidAttitude);
 				} else {
@@ -294,6 +302,7 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 			pressure = Double.MAX_VALUE;
 			temperature = Double.MAX_VALUE;
 			attitude = Double.MAX_VALUE;
+			dirtyPressure = false;
 		}
 
 		public long time;
@@ -302,6 +311,7 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 		public double pressure;
 		public double temperature;
 		public double attitude;
+		public boolean dirtyPressure;
 
 		// Hard coded ?????? I hate Java. 
 		public boolean needToExtrapolate() {
@@ -317,6 +327,7 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 			pressure = Double.MAX_VALUE;
 			temperature = Double.MAX_VALUE;
 			attitude = Double.MAX_VALUE;
+			dirtyPressure = false;
 		}
 		public Bundle clone() {
 			Bundle dummy = new Bundle();
@@ -326,7 +337,8 @@ public class FrameExtrapolationFilter extends MultiOutputFilterFramework
 			dummy.pressure = pressure;
 			dummy.temperature = temperature;
 			dummy.attitude = attitude;
-			
+			dummy.dirtyPressure = dirtyPressure;
+	
 			return dummy;
 		}
 	}
